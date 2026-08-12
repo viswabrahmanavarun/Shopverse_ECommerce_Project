@@ -12,7 +12,6 @@ import toast from 'react-hot-toast';
 import { useLocation } from 'react-router-dom';
 
 // ─── Order Tracking Stepper ───────────────────────────────────────────────────
-const ORDER_STEPS = ['processing', 'shipped', 'delivered'];
 const STEP_LABELS: Record<string, string> = {
   processing: 'Processing',
   shipped: 'Shipped',
@@ -28,46 +27,6 @@ const STEP_ICONS: Record<string, any> = {
   pending: Clock
 };
 
-function OrderTracker({ status }: { status: string }) {
-  if (status === 'cancelled') {
-    return (
-      <div className="flex items-center gap-2 mt-3 px-4 py-3 bg-red-50 rounded-xl text-red-600 text-sm font-medium">
-        <X size={16} /> Order Cancelled
-      </div>
-    );
-  }
-  const currentIdx = ORDER_STEPS.indexOf(status);
-  return (
-    <div className="mt-4 px-2">
-      <div className="flex items-center">
-        {ORDER_STEPS.map((step, idx) => {
-          const Icon = STEP_ICONS[step];
-          const done = idx <= currentIdx;
-          const active = idx === currentIdx;
-          return (
-            <div key={step} className="flex items-center flex-1">
-              <div className="flex flex-col items-center">
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-                  done ? 'bg-brand text-white shadow-md shadow-brand/30' : 'bg-gray-100 text-gray-400'
-                } ${active ? 'ring-4 ring-brand/20' : ''}`}>
-                  <Icon size={16} />
-                </div>
-                <span className={`text-[10px] font-bold mt-1.5 ${done ? 'text-brand' : 'text-gray-400'}`}>
-                  {STEP_LABELS[step]}
-                </span>
-              </div>
-              {idx < ORDER_STEPS.length - 1 && (
-                <div className={`flex-1 h-1 mx-1 mb-4 rounded-full transition-all ${
-                  idx < currentIdx ? 'bg-brand' : 'bg-gray-200'
-                }`} />
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
 // ─── Order Card ───────────────────────────────────────────────────────────────
 function OrderCard({ order }: { order: any }) {

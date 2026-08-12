@@ -1,5 +1,6 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from beanie import init_beanie
+from typing import Optional
 
 from app.core.config import settings
 from app.models.user import User
@@ -12,7 +13,7 @@ from app.models.otp import OTP
 import certifi
 
 # Global client (optional but recommended)
-client: AsyncIOMotorClient | None = None
+client: Optional[AsyncIOMotorClient] = None
 
 
 async def init_db():

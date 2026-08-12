@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, Loader2, Sparkles, User, Bot } from 'lucide-react';
 import api from '../../services/api';
-import { useAuthStore } from '../../store/authStore';
 
 export default function SupportChat() {
   const [isOpen, setIsOpen] = useState(false);
