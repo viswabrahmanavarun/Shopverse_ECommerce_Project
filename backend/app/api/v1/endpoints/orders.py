@@ -1,5 +1,8 @@
 from typing import Any, List
+import io
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
+from app.services.invoice import generate_invoice_pdf
 from app.api import deps
 from app.models.user import User
 from app.models.order import Order, StatusUpdate
@@ -181,3 +184,25 @@ async def update_order_status(
     # Reload to get fresh data
     order = await Order.get(id)
     return {**order.dict(exclude={"id"}), "id": str(order.id)}
+
+@router.get("/{id}/invoice")
+async def get_order_invoice(
+    id: str,
+    current_user: User = Depends(deps.get_current_user),
+) -> Any:
+    order = await Order.get(id)
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    if order.user_id != str(current_user.id) and current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not enough privileges")
+    
+    pdf_bytes = generate_invoice_pdf(order)
+    
+    return StreamingResponse(
+        io.BytesIO(pdf_bytes), 
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"attachment; filename=Invoice_Shopverse_{order.id}.pdf"
+        }
+    )

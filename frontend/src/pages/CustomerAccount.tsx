@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Package, User, Heart, ChevronDown, ChevronUp,
   MapPin, Phone, RefreshCw, Truck, CheckCircle,
-  Clock, ShoppingBag, Trash2, Edit2, Save, X, Plus, Home, Briefcase
+  Clock, ShoppingBag, Trash2, Edit2, Save, X, Plus, Home, Briefcase, Download
 } from 'lucide-react';
 import api from '../services/api';
 import { useAuthStore } from '../store/authStore';
@@ -31,6 +31,29 @@ const STEP_ICONS: Record<string, any> = {
 // ─── Order Card ───────────────────────────────────────────────────────────────
 function OrderCard({ order }: { order: any }) {
   const [expanded, setExpanded] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownloadInvoice = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDownloading(true);
+    try {
+      const response = await api.get(`/orders/${order.id}/invoice`, {
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Invoice_Shopverse_${order.id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success('Invoice downloaded successfully');
+    } catch (error) {
+      toast.error('Failed to download invoice');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   const paymentBadge = (status: string) => {
     const map: Record<string, string> = {
@@ -196,6 +219,14 @@ function OrderCard({ order }: { order: any }) {
                   {order.payment_id && (
                     <p className="text-xs text-gray-400 mt-2 font-mono truncate">ID: {order.payment_id}</p>
                   )}
+                  <button 
+                    onClick={handleDownloadInvoice}
+                    disabled={isDownloading}
+                    className="w-full mt-4 flex items-center justify-center gap-2 bg-white border-2 border-gray-200 text-gray-700 py-2.5 rounded-xl text-sm font-bold hover:border-brand hover:text-brand transition-colors disabled:opacity-50"
+                  >
+                    {isDownloading ? <RefreshCw className="animate-spin" size={16} /> : <Download size={16} />}
+                    {isDownloading ? 'Downloading...' : 'Download Invoice'}
+                  </button>
                 </div>
               </div>
             </div>

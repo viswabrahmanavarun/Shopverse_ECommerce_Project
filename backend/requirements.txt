@@ -14,3 +14,4 @@ razorpay
 email-validator
 google-generativeai
 mangum
+reportlab
